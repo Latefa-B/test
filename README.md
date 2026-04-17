@@ -1,5 +1,4 @@
 # Step-by-Step Guide to Deploy a 3-Tier AWS Architecture with Terraform 
-Step-by-Step Guide to Deploy a 3-Tier AWS Architecture with Load Balancer and Auto Scaling Using Terraform - Part 1 : Web Tier
 Deploying a 3-Tier Architecture with Load Balancer and Auto Scaling using Terraform as an Infrastructure as Code (IaC) tool, is a powerful approach to provision and manage such a robust Cloud Infrastructure. Deploying and managing it can be complex and time-consuming, but Terraform enables us to automate the process, in a consistent, efficient and repeatable way, reducing human errors.
 This comprehensive step-by-step guide walks you through the process of  deploying a 3-Tier Architecture with Load Balancer and Auto Scaling on AWS using a modular and production-style Terraform setup. This project consists of two parts :
 - **Part 1 : we will be deploying on the web-tier, using AWS services like : VPC, Subnets, Route Tables, Internet Gateway (IGW), Application Load Balancer (ALB), Launch Template, Auto Scaling Group, EC2 instances and Security Group.**
@@ -21,7 +20,8 @@ The aim of this project is to :
 - Deploy RDS in private subnets
 - Understand bastion SSH and private EC2 workflows
 
-## Prerequisites
+## Part 1 : Deploy the Web Tier with Load Balancer and Auto Scaling Using Terraform 
+### Prerequisites
 In order to proceed, we need to make sure beforehand to : 
 - Have Terraform and AWS CLI installed. 
 - Have AWS credentials (aws configure) configured.
@@ -39,44 +39,44 @@ Each configuration file defines how to provision and manage infrastructure resou
 - **autoscaling.tf** : defines and manages the autoscaling group.
 - **launch_template.tf** : defines the launch template resource.
 
-## Step-by-Step Instructions : 
-### Step 1: Configure AWS Provider
+### Step-by-Step Instructions : 
+#### Step 1: Configure AWS Provider
 On your configuration file provider.tf , write the code below. This tells Terraform to use AWS as a provider and the region us-east-1 as a region where all the resources will be created. The region us-east-1 is stable and free-tier friendly.
 <img width="560" height="135" alt="2" src="https://github.com/user-attachments/assets/bdcee071-e2a0-45e7-89f3-e8f5910e64fb" />
 
-### Step 2: Create VPC and Subnets
+#### Step 2: Create VPC and Subnets
 On your vpc.tf configuration file, add the code below. This will create a virtual private network on AWS, configure two public subnets in two different availability zones. Then,  will assign them public IP addresses. Configuring at least two public subnets in two different availability zones within the VPC allows the application to stay available if one zone fails.
 <img width="743" height="374" alt="4" src="https://github.com/user-attachments/assets/20e18558-d466-4712-af47-53a9ddcf3789" />
 
-### Step 3: Add Internet Access
+#### Step 3: Add Internet Access
 On your vpc.tf configuration file, add the code below. This will : 
 - Configure an Internet Gateway. It will allow the Public subnet to have access to the internet. 
 - Configure a public route table and associate it to the internet Gateway and to both public subnets.
 - Without the internet, no one can visit your application. The Internet Gateway lets the servers inside your VPC connect to the outside world.
 <img width="855" height="701" alt="7" src="https://github.com/user-attachments/assets/bb896aee-f9c1-4933-a4ef-9448114139ad" />
 
-### Step 4: Set Up Security Groups
+#### Step 4: Set Up Security Groups
 On your security_group.tf configuration file, add the code below. This will configure two security groups. Security Groups act like locked doors. The ALB SG allows HTTP traffic on port 80. The EC2 SG allows only HTTP traffic from the ALB on port 80, as well.
 <img width="816" height="599" alt="10" src="https://github.com/user-attachments/assets/52105da3-c13c-4eb1-9ba2-f69dd61d85b8" />
 
-### Step 5: Create the Load Balancer
+#### Step 5: Create the Load Balancer
 On your alb.tf configuration file, add the code below. This will configure a load balancer, a target group and a listener for the ALB on Port 80. The load balancer spreads traffic across multiple EC2s. If one EC2 fails, the others will still work.
 <img width="736" height="551" alt="13" src="https://github.com/user-attachments/assets/be1704b0-3a17-4b99-96fd-8b586d07afa7" />
 
-### Step 6: Create Launch Template
+#### Step 6: Create Launch Template
 On your launch_template.tf configuration file, add the code below. This will create a launch template for the EC2 instances and the Auto Scaling Group. A Launch Template is like a blueprint for EC2 instances. It installs nginx, starts the service, and shows a custom message.
 <img width="663" height="345" alt="15" src="https://github.com/user-attachments/assets/a949cb9e-4c76-45ad-a48f-d06c39f370c6" />
 
-### Step 7: Create Auto Scaling Group
+#### Step 7: Create Auto Scaling Group
 - On your autoscaling.tf  configuration file, add the code below. This will create an auto scaling group for your application and will use the Launch Template created previously. The Auto Scaling Group automatically launches multiple EC2s based on demand. It connects them to the Load Balancer for traffic distribution.
 
 <img width="647" height="355" alt="17" src="https://github.com/user-attachments/assets/671e0e1a-45aa-4fb4-989f-c509bc2fa389" />
 
-### Step 8: Output the Load Balancer URL
+#### Step 8: Output the Load Balancer URL
 On your outputs.tf file, write the code below. The output.tf configuration file is optional but helpful, it allows users to understand the configuration and review its expected outputs. It shows your load balancer's public URL after Terraform finishes.
 <img width="547" height="164" alt="19" src="https://github.com/user-attachments/assets/3404b60f-e2d8-43a2-a706-08fa69596473" />
 
-### Step 9 : Deploy Your Infrastructure
+#### Step 9 : Deploy Your Infrastructure
 Now that we have defined the configuration files, we will deploy the infrastructure.
 - Run terraform init command : to Initialize the working directory/project, download the necessary plugins and prepare terraform.
 <img width="799" height="312" alt="20" src="https://github.com/user-attachments/assets/29883145-0c66-4212-b0ba-ff9e35ec2fd2" />
@@ -125,7 +125,7 @@ Now that we have defined the configuration files, we will deploy the infrastruct
 - **Auto Scaling Group**
 <img width="1458" height="719" alt="41" src="https://github.com/user-attachments/assets/3f1ad444-4e1c-4bf1-995c-dae56a197714" />
 
-### Step 10 : Destroy (Cleanup)
+#### Step 10 : Destroy (Cleanup)
 Now that your web server application was deployed successfully, clean up your infrastructure ! This prevents charges on your AWS account.
 - Run terraform destroy command : to delete the infrastructure and remove all the resources managed by terraform.
 - Type yes when prompted.
@@ -142,12 +142,6 @@ Now that your web server application was deployed successfully, clean up your in
 - Check your infrastructure on AWS Console. The VPC was deleted as well as its components.
 <img width="1457" height="474" alt="51" src="https://github.com/user-attachments/assets/b28e9b17-a7b7-4582-a43d-9652c268672a" />
 
-### Summary
-This breakdown provides a step-by-step guide to deploy a 3-Tier Architecture with Load Balancer and Auto Scaling on AWS using Terraform. By completing this lab, we had an overview on how to : 
-- Build the infrastructure from scratch using a modular and production-style Terraform setup, from creating the VPC, to configuring subnets and internet gateway, to connecting to the internet using Internet Gateway and understanding how routing works in AWS  but also to deploying multiple EC2 instances automatically using an Auto Scaling Group, balancing incoming traffic with a Load Balancer and what security best practices to set up with security groups to control access.
-- Organize Terraform code into separate files like in real-word production to keep the code clean, maintainable and reusable. Separating configuration files in blocks has several benefits like enhancing scalability, a better organization and team collaboration. It improves readability, reusability and maintainability of the code. It allows different teams to work on different parts of the project at the same time. Helps manage large and complex infrastructure, but also, promotes faster troubleshooting.
-
-Building Infrastructure with Terraform as an IaC tool is an approach that not only provision, manage, and replicate cloud resources in a predictable and automated way. But also, reduces manual errors and enhances the scalability and maintainability of the infrastructure. This approach of building infrastructure using IaC, demonstrated how it can simplify and automate the process of deploying and managing a well-structured private network environment that requires high security and scalability and more complex cloud infrastructures. But also how Terraform lays the foundation for modern DevOps practices such as CI/CD, monitoring, and infrastructure testing.
 
 
 # Step-by-Step Guide to Deploy a 3-Tier AWS Architecture Using Terraform - Part 2 : Application & Database Tiers
@@ -340,8 +334,14 @@ Now that your web server application was deployed successfully, clean up your in
 - Check your infrastructure on AWS Console. The VPC was deleted as well as its components
 <img width="1408" height="492" alt="66" src="https://github.com/user-attachments/assets/e05dfb05-4195-47ff-83bb-6249ce0259de" />
 
-
 ### Summary
+This breakdown provides a step-by-step guide to deploy a 3-Tier Architecture with Load Balancer and Auto Scaling on AWS using Terraform. By completing this lab, we had an overview on how to : 
+- Build the infrastructure from scratch using a modular and production-style Terraform setup, from creating the VPC, to configuring subnets and internet gateway, to connecting to the internet using Internet Gateway and understanding how routing works in AWS  but also to deploying multiple EC2 instances automatically using an Auto Scaling Group, balancing incoming traffic with a Load Balancer and what security best practices to set up with security groups to control access.
+- Organize Terraform code into separate files like in real-word production to keep the code clean, maintainable and reusable. Separating configuration files in blocks has several benefits like enhancing scalability, a better organization and team collaboration. It improves readability, reusability and maintainability of the code. It allows different teams to work on different parts of the project at the same time. Helps manage large and complex infrastructure, but also, promotes faster troubleshooting.
+
+Building Infrastructure with Terraform as an IaC tool is an approach that not only provision, manage, and replicate cloud resources in a predictable and automated way. But also, reduces manual errors and enhances the scalability and maintainability of the infrastructure. This approach of building infrastructure using IaC, demonstrated how it can simplify and automate the process of deploying and managing a well-structured private network environment that requires high security and scalability and more complex cloud infrastructures. But also how Terraform lays the foundation for modern DevOps practices such as CI/CD, monitoring, and infrastructure testing.
+
+### Summary2
 This breakdown provides a step-by-step guide to deploy a 3-Tier Architecture (web tier, app tier and db tier), with Load Balancer and Auto Scaling on AWS using Terraform. By completing this lab, we had an overview on how to : 
 - Build a secure, production-style 3-tier VPC environment using a modular and production-style Terraform setup : From setting up the Virtual Private Network : VPC and its components, to setting up the ALB, and Auto Scaling Groups for the Web Tie, to setting up the bastion host to access the private EC2 Instance in the Application Tier to configuring an RDS Database for the DB Tier. 
 - Organize Terraform code into separate files like in real-word production to keep the code clean, maintainable and reusable. Separating configuration files in blocks has several benefits like enhancing scalability, a better organization and team collaboration. It improves readability, reusability and maintainability of the code. It allows different teams to work on different parts of the project at the same time. Helps manage large and complex infrastructure, but also, promotes faster troubleshooting.
